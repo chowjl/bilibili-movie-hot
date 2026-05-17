@@ -8,14 +8,14 @@ const state = {
 
 const modeMeta = {
   movie: {
-    title: "B站今日热门电影",
-    eyebrow: "Bilibili Movie Radar",
+    title: "B站解说",
+    eyebrow: "",
     loading: "正在抓取 B 站今日电影热度...",
     empty: "暂无电影数据。"
   },
   commentary: {
-    title: "今日电影解说热门",
-    eyebrow: "Bilibili Commentary Radar",
+    title: "B站解说",
+    eyebrow: "",
     loading: "正在抓取 B 站今日电影解说热度...",
     empty: "暂无电影解说数据。"
   }
