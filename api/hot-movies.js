@@ -5,6 +5,22 @@ const cache = {
   payloads: new Map()
 };
 
+function createSearchMode(keyword, sourceName) {
+  const encoded = encodeURIComponent(keyword);
+  return {
+    sources: [
+      {
+        source: `${sourceName}热门`,
+        path: `/x/web-interface/search/type?search_type=video&keyword=${encoded}&order=click&duration=0&page=1`
+      },
+      {
+        source: `${sourceName}最新`,
+        path: `/x/web-interface/search/type?search_type=video&keyword=${encoded}&order=pubdate&duration=0&page=1`
+      }
+    ]
+  };
+}
+
 const VIDEO_MODES = {
   movie: {
     sources: [
@@ -26,6 +42,18 @@ const VIDEO_MODES = {
         path:
           "/x/web-interface/search/type?search_type=video&keyword=%E7%94%B5%E5%BD%B1%E8%A7%A3%E8%AF%B4&order=pubdate&duration=0&page=1"
       }
+    ]
+  },
+  classic: createSearchMode("经典电影", "经典电影"),
+  usDrama: createSearchMode("美剧", "美剧"),
+  cnDrama: createSearchMode("国剧", "国剧"),
+  krDrama: createSearchMode("韩剧", "韩剧"),
+  jpDrama: createSearchMode("日剧", "日剧"),
+  variety: {
+    sources: [
+      { source: "综艺排行", path: "/x/web-interface/ranking/region?rid=71&day=3" },
+      { source: "综艺最新", path: "/x/web-interface/dynamic/region?ps=30&rid=71" },
+      ...createSearchMode("综艺", "综艺").sources
     ]
   }
 };
@@ -164,7 +192,8 @@ module.exports = async function handler(req, res) {
     return;
   }
 
-  const type = (req.query && req.query.type) === "commentary" ? "commentary" : "movie";
+  const requestedType = req.query && typeof req.query.type === "string" ? req.query.type : "movie";
+  const type = VIDEO_MODES[requestedType] ? requestedType : "movie";
   const cached = cache.payloads.get(type);
   if (cached && Date.now() - cached.createdAt < 3 * 60 * 1000) {
     sendJson(res, 200, { ...cached.payload, cached: true });

@@ -186,6 +186,15 @@ button:disabled {
   backdrop-filter: blur(22px);
 }
 
+.pageTabs {
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.pageTabs::-webkit-scrollbar {
+  display: none;
+}
+
 .pageTabs button,
 .segmented button {
   flex: 0 0 auto;

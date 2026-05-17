@@ -8,7 +8,7 @@ const state = {
 
 const modeMeta = {
   movie: {
-    title: "B站解说",
+    title: "B站热门电影",
     eyebrow: "",
     loading: "正在抓取 B 站今日电影热度...",
     empty: "暂无电影数据。"
@@ -18,6 +18,42 @@ const modeMeta = {
     eyebrow: "",
     loading: "正在抓取 B 站今日电影解说热度...",
     empty: "暂无电影解说数据。"
+  },
+  classic: {
+    title: "B站经典电影",
+    eyebrow: "",
+    loading: "正在抓取 B 站经典电影热度...",
+    empty: "暂无经典电影数据。"
+  },
+  usDrama: {
+    title: "B站美剧",
+    eyebrow: "",
+    loading: "正在抓取 B 站美剧热度...",
+    empty: "暂无美剧数据。"
+  },
+  cnDrama: {
+    title: "B站国剧",
+    eyebrow: "",
+    loading: "正在抓取 B 站国剧热度...",
+    empty: "暂无国剧数据。"
+  },
+  krDrama: {
+    title: "B站韩剧",
+    eyebrow: "",
+    loading: "正在抓取 B 站韩剧热度...",
+    empty: "暂无韩剧数据。"
+  },
+  jpDrama: {
+    title: "B站日剧",
+    eyebrow: "",
+    loading: "正在抓取 B 站日剧热度...",
+    empty: "暂无日剧数据。"
+  },
+  variety: {
+    title: "B站综艺",
+    eyebrow: "",
+    loading: "正在抓取 B 站综艺热度...",
+    empty: "暂无综艺数据。"
   }
 };
 
@@ -97,7 +133,7 @@ function matchesTimeFilter(video, filter) {
 }
 
 function updatePageMeta() {
-  const meta = modeMeta[state.mode];
+  const meta = modeMeta[state.mode] || modeMeta.commentary;
   pageTitle.textContent = meta.title;
   pageEyebrow.textContent = meta.eyebrow;
   document.title = meta.title;
@@ -125,7 +161,9 @@ function render() {
 
   if (!videos.length) {
     statusBox.hidden = false;
-    statusBox.textContent = state.videos.length ? "没有匹配的视频，换个关键词试试。" : modeMeta[state.mode].empty;
+    statusBox.textContent = state.videos.length
+      ? "没有匹配的视频，换个关键词试试。"
+      : (modeMeta[state.mode] || modeMeta.commentary).empty;
     return;
   }
 
@@ -165,7 +203,7 @@ async function loadData() {
   updatePageMeta();
   refreshBtn.disabled = true;
   statusBox.hidden = false;
-  statusBox.textContent = modeMeta[state.mode].loading;
+  statusBox.textContent = (modeMeta[state.mode] || modeMeta.commentary).loading;
 
   try {
     const response = await fetch(`/api/hot-movies?type=${state.mode}`);

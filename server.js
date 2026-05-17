@@ -19,6 +19,22 @@ const MIME_TYPES = {
 
 const cache = new Map();
 
+function createSearchMode(keyword, sourceName) {
+  const encoded = encodeURIComponent(keyword);
+  return {
+    sources: [
+      {
+        source: `${sourceName}热门`,
+        path: `/x/web-interface/search/type?search_type=video&keyword=${encoded}&order=click&duration=0&page=1`
+      },
+      {
+        source: `${sourceName}最新`,
+        path: `/x/web-interface/search/type?search_type=video&keyword=${encoded}&order=pubdate&duration=0&page=1`
+      }
+    ]
+  };
+}
+
 const VIDEO_MODES = {
   movie: {
     sources: [
@@ -40,6 +56,18 @@ const VIDEO_MODES = {
         path:
           "/x/web-interface/search/type?search_type=video&keyword=%E7%94%B5%E5%BD%B1%E8%A7%A3%E8%AF%B4&order=pubdate&duration=0&page=1"
       }
+    ]
+  },
+  classic: createSearchMode("经典电影", "经典电影"),
+  usDrama: createSearchMode("美剧", "美剧"),
+  cnDrama: createSearchMode("国剧", "国剧"),
+  krDrama: createSearchMode("韩剧", "韩剧"),
+  jpDrama: createSearchMode("日剧", "日剧"),
+  variety: {
+    sources: [
+      { source: "综艺排行", path: "/x/web-interface/ranking/region?rid=71&day=3" },
+      { source: "综艺最新", path: "/x/web-interface/dynamic/region?ps=30&rid=71" },
+      ...createSearchMode("综艺", "综艺").sources
     ]
   }
 };
@@ -176,7 +204,8 @@ async function collectMovieVideos(type = "movie") {
 
 async function handleApi(req, res) {
   const requestUrl = new URL(req.url, `http://${req.headers.host}`);
-  const type = requestUrl.searchParams.get("type") === "commentary" ? "commentary" : "movie";
+  const requestedType = requestUrl.searchParams.get("type") || "movie";
+  const type = VIDEO_MODES[requestedType] ? requestedType : "movie";
   const key = `hot-${type}`;
   const cached = cache.get(key);
   if (cached && Date.now() - cached.createdAt < 3 * 60 * 1000) {
