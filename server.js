@@ -49,6 +49,22 @@ function createClassicMode() {
   };
 }
 
+function createDramaMode(keyword, sourceName, filterPattern) {
+  return {
+    sources: [
+      { source: "电视剧排行", path: "/x/web-interface/ranking/region?rid=11&day=3" },
+      { source: "电视剧最新", path: "/x/web-interface/dynamic/region?ps=30&rid=11" },
+      { source: "影视剪辑排行", path: "/x/web-interface/ranking/region?rid=181&day=3" },
+      { source: "影视剪辑最新", path: "/x/web-interface/dynamic/region?ps=30&rid=181" },
+      { source: "影视杂谈排行", path: "/x/web-interface/ranking/region?rid=182&day=3" },
+      { source: "影视杂谈最新", path: "/x/web-interface/dynamic/region?ps=30&rid=182" },
+      ...createSearchMode(keyword, sourceName).sources
+    ],
+    filterPattern,
+    sourcePrefixes: [sourceName]
+  };
+}
+
 const VIDEO_MODES = {
   movie: {
     sources: [
@@ -73,10 +89,10 @@ const VIDEO_MODES = {
     ]
   },
   classic: createClassicMode(),
-  usDrama: createSearchMode("美剧", "美剧"),
-  cnDrama: createSearchMode("国剧", "国剧"),
-  krDrama: createSearchMode("韩剧", "韩剧"),
-  jpDrama: createSearchMode("日剧", "日剧"),
+  usDrama: createDramaMode("美剧", "美剧", /(美剧|欧美|英剧|网飞|Netflix|HBO|美[国]?电视剧)/i),
+  cnDrama: createDramaMode("国剧", "国剧", /(国剧|国产剧|内地剧|大陆剧|电视剧|古装剧|年代剧|悬疑剧|刑侦剧)/i),
+  krDrama: createDramaMode("韩剧", "韩剧", /(韩剧|韩国剧|韩国电视剧|韩[国]?剧)/i),
+  jpDrama: createDramaMode("日剧", "日剧", /(日剧|日本剧|日本电视剧|晨间剧)/i),
   variety: {
     sources: [
       { source: "综艺排行", path: "/x/web-interface/ranking/region?rid=71&day=3" },
