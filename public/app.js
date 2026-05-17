@@ -1,8 +1,24 @@
 const state = {
   videos: [],
+  mode: "movie",
   filter: "all",
   sort: "hot",
   query: ""
+};
+
+const modeMeta = {
+  movie: {
+    title: "B站今日热门电影",
+    eyebrow: "Bilibili Movie Radar",
+    loading: "正在抓取 B 站今日电影热度...",
+    empty: "暂无电影数据。"
+  },
+  commentary: {
+    title: "今日电影解说热门",
+    eyebrow: "Bilibili Commentary Radar",
+    loading: "正在抓取 B 站今日电影解说热度...",
+    empty: "暂无电影解说数据。"
+  }
 };
 
 const grid = document.querySelector("#grid");
@@ -11,6 +27,8 @@ const template = document.querySelector("#videoCardTemplate");
 const refreshBtn = document.querySelector("#refreshBtn");
 const searchInput = document.querySelector("#searchInput");
 const sortSelect = document.querySelector("#sortSelect");
+const pageTitle = document.querySelector("#pageTitle");
+const pageEyebrow = document.querySelector("#pageEyebrow");
 const todayCount = document.querySelector("#todayCount");
 const totalCount = document.querySelector("#totalCount");
 const updateTime = document.querySelector("#updateTime");
@@ -31,6 +49,13 @@ function formatTime(value) {
 
 function coverUrl(src) {
   return src ? `/api/cover?src=${encodeURIComponent(src)}` : "";
+}
+
+function updatePageMeta() {
+  const meta = modeMeta[state.mode];
+  pageTitle.textContent = meta.title;
+  pageEyebrow.textContent = meta.eyebrow;
+  document.title = meta.title;
 }
 
 function getSortedVideos() {
@@ -55,7 +80,7 @@ function render() {
 
   if (!videos.length) {
     statusBox.hidden = false;
-    statusBox.textContent = state.videos.length ? "没有匹配的视频，换个关键词试试。" : "暂无数据。";
+    statusBox.textContent = state.videos.length ? "没有匹配的视频，换个关键词试试。" : modeMeta[state.mode].empty;
     return;
   }
 
@@ -92,12 +117,13 @@ function render() {
 }
 
 async function loadData() {
+  updatePageMeta();
   refreshBtn.disabled = true;
   statusBox.hidden = false;
-  statusBox.textContent = "正在抓取 B 站今日电影热度...";
+  statusBox.textContent = modeMeta[state.mode].loading;
 
   try {
-    const response = await fetch("/api/hot-movies");
+    const response = await fetch(`/api/hot-movies?type=${state.mode}`);
     const payload = await response.json();
     if (!response.ok) throw new Error(payload.detail || payload.error || "请求失败");
 
@@ -125,6 +151,22 @@ document.querySelectorAll(".segmented button").forEach((button) => {
     button.classList.add("active");
     state.filter = button.dataset.filter;
     render();
+  });
+});
+
+document.querySelectorAll(".pageTabs button").forEach((button) => {
+  button.addEventListener("click", () => {
+    if (button.dataset.mode === state.mode) return;
+    document.querySelectorAll(".pageTabs button").forEach((item) => item.classList.remove("active"));
+    button.classList.add("active");
+    state.mode = button.dataset.mode;
+    state.filter = "all";
+    state.query = "";
+    searchInput.value = "";
+    document.querySelectorAll(".segmented button").forEach((item) => {
+      item.classList.toggle("active", item.dataset.filter === "all");
+    });
+    loadData();
   });
 });
 

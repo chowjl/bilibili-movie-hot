@@ -10,10 +10,14 @@
     <main class="shell">
       <section class="topbar" aria-label="筛选">
         <div>
-          <p class="eyebrow">Bilibili Movie Radar</p>
-          <h1>B站今日热门电影</h1>
+          <p class="eyebrow" id="pageEyebrow">Bilibili Movie Radar</p>
+          <h1 id="pageTitle">B站今日热门电影</h1>
         </div>
         <div class="actions">
+          <div class="pageTabs" role="group" aria-label="页面">
+            <button class="active" data-mode="movie" type="button">热门电影</button>
+            <button data-mode="commentary" type="button">电影解说</button>
+          </div>
           <label class="search">
             <span>搜索</span>
             <input id="searchInput" type="search" placeholder="片名、UP主、关键词" autocomplete="off" />

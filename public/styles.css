@@ -169,6 +169,7 @@ button:disabled {
   margin: 18px 0;
 }
 
+.pageTabs,
 .segmented {
   display: inline-flex;
   padding: 4px;
@@ -179,6 +180,7 @@ button:disabled {
   backdrop-filter: blur(22px);
 }
 
+.pageTabs button,
 .segmented button {
   min-height: 36px;
   border: 0;
@@ -187,6 +189,7 @@ button:disabled {
   box-shadow: none;
 }
 
+.pageTabs button.active,
 .segmented button.active {
   background: var(--panel-solid);
   color: var(--ink);

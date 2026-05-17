@@ -2,7 +2,30 @@ const API_BASE = "https://api.bilibili.com";
 
 const cache = {
   createdAt: 0,
-  payload: null
+  payloads: new Map()
+};
+
+const VIDEO_MODES = {
+  movie: {
+    sources: [
+      { source: "电影分区排行", path: "/x/web-interface/ranking/region?rid=23&day=3" },
+      { source: "电影分区最新", path: "/x/web-interface/dynamic/region?ps=50&rid=23" }
+    ]
+  },
+  commentary: {
+    sources: [
+      {
+        source: "电影解说热门",
+        path:
+          "/x/web-interface/search/type?search_type=video&keyword=%E7%94%B5%E5%BD%B1%E8%A7%A3%E8%AF%B4&order=click&duration=0&page=1"
+      },
+      {
+        source: "电影解说最新",
+        path:
+          "/x/web-interface/search/type?search_type=video&keyword=%E7%94%B5%E5%BD%B1%E8%A7%A3%E8%AF%B4&order=pubdate&duration=0&page=1"
+      }
+    ]
+  }
 };
 
 function sendJson(res, status, payload) {
@@ -21,6 +44,18 @@ function getShanghaiDateKey(seconds = Date.now() / 1000) {
   }).format(new Date(seconds * 1000));
 }
 
+function stripHtml(value) {
+  return String(value || "").replace(/<[^>]*>/g, "");
+}
+
+function parseStatValue(value) {
+  if (typeof value === "number") return value;
+  const text = String(value || "").replace(/,/g, "").trim();
+  if (!text) return 0;
+  if (text.endsWith("万")) return Math.round(Number(text.slice(0, -1)) * 10000) || 0;
+  return Number(text) || 0;
+}
+
 function normalizeVideo(item, source) {
   const stat = item.stat || {};
   const owner = item.owner || item.author || {};
@@ -32,8 +67,8 @@ function normalizeVideo(item, source) {
   return {
     id: bvid || aid,
     bvid,
-    title: item.title || "未命名视频",
-    desc: item.desc || item.description || "",
+    title: stripHtml(item.title) || "未命名视频",
+    desc: stripHtml(item.desc || item.description || ""),
     author: owner.name || item.author || "未知 UP 主",
     cover: pic,
     url: bvid ? `https://www.bilibili.com/video/${bvid}` : `https://www.bilibili.com/video/av${aid}`,
@@ -42,13 +77,13 @@ function normalizeVideo(item, source) {
     duration: item.duration || "",
     source,
     stats: {
-      view: Number(stat.view || item.play || 0),
-      danmaku: Number(stat.danmaku || item.video_review || 0),
-      like: Number(stat.like || 0),
-      coin: Number(stat.coin || 0),
-      favorite: Number(stat.favorite || 0),
-      share: Number(stat.share || 0),
-      reply: Number(stat.reply || 0)
+      view: parseStatValue(stat.view || item.play),
+      danmaku: parseStatValue(stat.danmaku || item.video_review),
+      like: parseStatValue(stat.like),
+      coin: parseStatValue(stat.coin),
+      favorite: parseStatValue(stat.favorite || item.favorites),
+      share: parseStatValue(stat.share),
+      reply: parseStatValue(stat.reply)
     }
   };
 }
@@ -84,23 +119,23 @@ async function bilibiliFetch(pathname) {
   return payload;
 }
 
-async function collectMovieVideos() {
+async function collectMovieVideos(type = "movie") {
   const today = getShanghaiDateKey();
-  const endpoints = [
-    { source: "电影分区排行", path: "/x/web-interface/ranking/region?rid=23&day=3" },
-    { source: "电影分区最新", path: "/x/web-interface/dynamic/region?ps=50&rid=23" }
-  ];
+  const mode = VIDEO_MODES[type] || VIDEO_MODES.movie;
+  const endpoints = mode.sources;
 
-  const results = await Promise.allSettled(endpoints.map((endpoint) => bilibiliFetch(endpoint.path)));
   const videos = [];
 
-  results.forEach((result, index) => {
-    if (result.status !== "fulfilled") return;
-    const source = endpoints[index].source;
-    const data = result.value.data || {};
-    const list = Array.isArray(data) ? data : data.archives || data.list || data.result || [];
-    list.forEach((item) => videos.push(normalizeVideo(item, source)));
-  });
+  for (const endpoint of endpoints) {
+    try {
+      const result = await bilibiliFetch(endpoint.path);
+      const data = result.data || {};
+      const list = Array.isArray(data) ? data : data.archives || data.list || data.result || [];
+      list.forEach((item) => videos.push(normalizeVideo(item, endpoint.source)));
+    } catch (error) {
+      console.warn(`${endpoint.source} failed: ${error.message}`);
+    }
+  }
 
   const ranked = Array.from(new Map(videos.filter((video) => video.id).map((video) => [video.id, video])).values())
     .map((video) => ({
@@ -127,15 +162,16 @@ module.exports = async function handler(req, res) {
     return;
   }
 
-  if (cache.payload && Date.now() - cache.createdAt < 3 * 60 * 1000) {
-    sendJson(res, 200, { ...cache.payload, cached: true });
+  const type = (req.query && req.query.type) === "commentary" ? "commentary" : "movie";
+  const cached = cache.payloads.get(type);
+  if (cached && Date.now() - cached.createdAt < 3 * 60 * 1000) {
+    sendJson(res, 200, { ...cached.payload, cached: true });
     return;
   }
 
   try {
-    const payload = await collectMovieVideos();
-    cache.createdAt = Date.now();
-    cache.payload = payload;
+    const payload = await collectMovieVideos(type);
+    cache.payloads.set(type, { createdAt: Date.now(), payload });
     sendJson(res, 200, { ...payload, cached: false });
   } catch (error) {
     sendJson(res, 502, {
