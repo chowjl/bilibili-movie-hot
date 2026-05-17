@@ -51,6 +51,51 @@ function coverUrl(src) {
   return src ? `/api/cover?src=${encodeURIComponent(src)}` : "";
 }
 
+function getShanghaiNow() {
+  const now = new Date();
+  const shanghaiText = now.toLocaleString("sv-SE", {
+    timeZone: "Asia/Shanghai",
+    hour12: false
+  });
+  return new Date(shanghaiText.replace(" ", "T"));
+}
+
+function getWeekStart(date) {
+  const start = new Date(date);
+  const day = start.getDay();
+  const offset = day === 0 ? 6 : day - 1;
+  start.setHours(0, 0, 0, 0);
+  start.setDate(start.getDate() - offset);
+  return start;
+}
+
+function matchesTimeFilter(video, filter) {
+  if (filter === "all") return true;
+  if (!video.pubdate) return false;
+
+  const now = getShanghaiNow();
+  const publishedAt = new Date(video.pubdate * 1000);
+
+  if (filter === "today") return video.isToday;
+
+  if (filter === "week") {
+    return publishedAt >= getWeekStart(now);
+  }
+
+  if (filter === "month") {
+    return (
+      publishedAt.getFullYear() === now.getFullYear() &&
+      publishedAt.getMonth() === now.getMonth()
+    );
+  }
+
+  if (filter === "year") {
+    return publishedAt.getFullYear() === now.getFullYear();
+  }
+
+  return true;
+}
+
 function updatePageMeta() {
   const meta = modeMeta[state.mode];
   pageTitle.textContent = meta.title;
@@ -61,7 +106,7 @@ function updatePageMeta() {
 function getSortedVideos() {
   const query = state.query.trim().toLowerCase();
   const filtered = state.videos.filter((video) => {
-    const matchesFilter = state.filter === "all" || video.isToday;
+    const matchesFilter = matchesTimeFilter(video, state.filter);
     const haystack = `${video.title} ${video.author} ${video.desc}`.toLowerCase();
     return matchesFilter && (!query || haystack.includes(query));
   });

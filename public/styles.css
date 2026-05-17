@@ -182,11 +182,21 @@ button:disabled {
 
 .pageTabs button,
 .segmented button {
+  flex: 0 0 auto;
   min-height: 36px;
   border: 0;
   border-radius: 12px;
   background: transparent;
   box-shadow: none;
+}
+
+.segmented {
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.segmented::-webkit-scrollbar {
+  display: none;
 }
 
 .pageTabs button.active,
