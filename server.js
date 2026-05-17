@@ -28,6 +28,8 @@ const VIDEO_MODES = {
   },
   commentary: {
     sources: [
+      { source: "影视杂谈排行", path: "/x/web-interface/ranking/region?rid=182&day=3" },
+      { source: "影视杂谈最新", path: "/x/web-interface/dynamic/region?ps=30&rid=182" },
       {
         source: "电影解说热门",
         path:
