@@ -362,9 +362,26 @@ h2 {
     width: 100%;
   }
 
-  .summary,
   .grid {
     grid-template-columns: 1fr;
+  }
+
+  .summary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .summary > div {
+    padding: 14px 12px;
+  }
+
+  .summary strong {
+    font-size: clamp(22px, 6vw, 28px);
+    line-height: 1;
+  }
+
+  .summary span {
+    font-size: 12px;
   }
 
   .shell {
