@@ -161,6 +161,12 @@ button:disabled {
   font-weight: 600;
 }
 
+.modeRow {
+  display: flex;
+  justify-content: flex-start;
+  margin: 0 0 18px;
+}
+
 .controls {
   display: flex;
   justify-content: space-between;
