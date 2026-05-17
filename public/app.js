@@ -1,6 +1,6 @@
 const state = {
   videos: [],
-  mode: "movie",
+  mode: "commentary",
   filter: "all",
   sort: "hot",
   query: ""
