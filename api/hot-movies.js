@@ -21,6 +21,20 @@ function createSearchMode(keyword, sourceName) {
   };
 }
 
+function createClassicMode() {
+  return {
+    sources: [
+      { source: "电影分区排行", path: "/x/web-interface/ranking/region?rid=23&day=3" },
+      { source: "电影分区最新", path: "/x/web-interface/dynamic/region?ps=50&rid=23" },
+      { source: "影视杂谈排行", path: "/x/web-interface/ranking/region?rid=182&day=3" },
+      { source: "影视杂谈最新", path: "/x/web-interface/dynamic/region?ps=30&rid=182" },
+      ...createSearchMode("经典电影", "经典电影").sources
+    ],
+    filterPattern: /(经典|老电影|豆瓣|高分|影史|必看|怀旧|神作|港片|影评)/i,
+    sourcePrefixes: ["经典电影"]
+  };
+}
+
 const VIDEO_MODES = {
   movie: {
     sources: [
@@ -44,7 +58,7 @@ const VIDEO_MODES = {
       }
     ]
   },
-  classic: createSearchMode("经典电影", "经典电影"),
+  classic: createClassicMode(),
   usDrama: createSearchMode("美剧", "美剧"),
   cnDrama: createSearchMode("国剧", "国剧"),
   krDrama: createSearchMode("韩剧", "韩剧"),
@@ -178,10 +192,18 @@ async function collectMovieVideos(type = "movie") {
       return b.hotScore - a.hotScore;
     });
 
+  const filteredRanked = mode.filterPattern
+    ? ranked.filter((video) => {
+        const bySource = (mode.sourcePrefixes || []).some((prefix) => video.source.startsWith(prefix));
+        const haystack = `${video.title} ${video.desc}`;
+        return bySource || mode.filterPattern.test(haystack);
+      })
+    : ranked;
+
   return {
     updatedAt: new Date().toISOString(),
     dateKey: today,
-    videos: ranked.slice(0, 60),
+    videos: filteredRanked.slice(0, 60),
     sources: endpoints.map((endpoint) => endpoint.source)
   };
 }
