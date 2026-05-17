@@ -1,0 +1,12 @@
+{
+  "name": "bilibili-movie-hot-today",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A small app for finding today's hot Bilibili movie videos.",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

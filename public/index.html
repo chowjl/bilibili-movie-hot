@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>B站今日热门电影</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="topbar" aria-label="筛选">
+        <div>
+          <p class="eyebrow">Bilibili Movie Radar</p>
+          <h1>B站今日热门电影</h1>
+        </div>
+        <div class="actions">
+          <label class="search">
+            <span>搜索</span>
+            <input id="searchInput" type="search" placeholder="片名、UP主、关键词" autocomplete="off" />
+          </label>
+          <button id="refreshBtn" type="button" title="刷新数据">
+            <span aria-hidden="true">↻</span>
+            刷新
+          </button>
+        </div>
+      </section>
+
+      <section class="summary" aria-live="polite">
+        <div>
+          <strong id="todayCount">--</strong>
+          <span>今日发布</span>
+        </div>
+        <div>
+          <strong id="totalCount">--</strong>
+          <span>候选视频</span>
+        </div>
+        <div>
+          <strong id="updateTime">--</strong>
+          <span>更新时间</span>
+        </div>
+      </section>
+
+      <section class="controls" aria-label="排序和过滤">
+        <div class="segmented" role="group" aria-label="过滤">
+          <button class="active" data-filter="all" type="button">全部</button>
+          <button data-filter="today" type="button">只看今天</button>
+        </div>
+        <label>
+          排序
+          <select id="sortSelect">
+            <option value="hot">综合热度</option>
+            <option value="view">播放最多</option>
+            <option value="like">点赞最多</option>
+            <option value="new">最新发布</option>
+          </select>
+        </label>
+      </section>
+
+      <section id="status" class="status">正在抓取 B 站今日电影热度...</section>
+      <section id="grid" class="grid" aria-label="热门电影列表"></section>
+    </main>
+
+    <template id="videoCardTemplate">
+      <article class="card">
+        <a class="coverLink" target="_blank" rel="noreferrer">
+          <img class="cover" alt="" loading="lazy" />
+          <span class="rank"></span>
+        </a>
+        <div class="cardBody">
+          <div class="metaLine">
+            <span class="badge"></span>
+            <span class="source"></span>
+          </div>
+          <h2></h2>
+          <p class="desc"></p>
+          <div class="author"></div>
+          <div class="stats"></div>
+        </div>
+      </article>
+    </template>
+
+    <script src="/app.js" defer></script>
+  </body>
+</html>

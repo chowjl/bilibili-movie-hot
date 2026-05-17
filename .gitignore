@@ -1,0 +1,9 @@
+.vs/
+*.log
+
+# Local media experiments are not needed for the web app deploy.
+*.png
+*.jpg
+*.jpeg
+
+!.github/
