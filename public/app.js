@@ -56,7 +56,7 @@ const modeMeta = {
     empty: "暂无综艺数据。"
   },
   huaqiang: {
-    title: "B站华强买瓜",
+    title: "B站华强",
     eyebrow: "",
     loading: "正在抓取 B 站华强买瓜 AI 二创...",
     empty: "暂无华强买瓜 AI 二创数据。"
