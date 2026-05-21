@@ -35,6 +35,14 @@ function createSearchMode(keyword, sourceName) {
   };
 }
 
+function createKeywordMode(keywords, sourceName, filterPattern) {
+  return {
+    sources: keywords.flatMap((keyword) => createSearchMode(keyword, sourceName).sources),
+    filterPattern,
+    sourcePrefixes: [sourceName]
+  };
+}
+
 function createClassicMode() {
   return {
     sources: [
@@ -99,7 +107,12 @@ const VIDEO_MODES = {
       { source: "综艺最新", path: "/x/web-interface/dynamic/region?ps=30&rid=71" },
       ...createSearchMode("综艺", "综艺").sources
     ]
-  }
+  },
+  huaqiang: createKeywordMode(
+    ["华强买瓜 ai二创", "华强买瓜"],
+    "华强买瓜AI",
+    /(华强买瓜|刘华强|这瓜保熟吗|保熟吗|买瓜|孙红雷)/i
+  )
 };
 
 function sendJson(res, status, payload) {
