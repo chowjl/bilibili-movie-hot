@@ -64,8 +64,8 @@ const modeMeta = {
   trailer: {
     title: "B站预告片",
     eyebrow: "",
-    loading: "正在抓取 B 站电影预告片热度...",
-    empty: "暂无预告片数据。"
+    loading: "正在抓取 B 站游戏、电视剧、电影预告...",
+    empty: "暂无游戏、电视剧、电影预告数据。"
   }
 };
 

@@ -95,9 +95,9 @@ const VIDEO_MODES = {
     ]
   },
   trailer: createKeywordMode(
-    ["电影预告片", "新片预告", "预告片"],
+    ["电影预告片", "电视剧预告", "游戏预告", "新片预告", "预告片"],
     "预告片",
-    /(预告|首曝|定档|先导|终极预告|新片|片花|trail?er)/i
+    /(预告|首曝|定档|先导|终极预告|新片|片花|电视剧|剧集|游戏|PV|trail?er)/i
   ),
   huaqiang: createKeywordMode(
     ["华强买瓜 ai二创", "华强买瓜"],
