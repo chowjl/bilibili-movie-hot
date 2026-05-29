@@ -60,6 +60,12 @@ const modeMeta = {
     eyebrow: "",
     loading: "正在抓取 B 站华强买瓜 AI 二创...",
     empty: "暂无华强买瓜 AI 二创数据。"
+  },
+  trailer: {
+    title: "B站预告片",
+    eyebrow: "",
+    loading: "正在抓取 B 站电影预告片热度...",
+    empty: "暂无预告片数据。"
   }
 };
 

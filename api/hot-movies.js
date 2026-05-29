@@ -94,6 +94,11 @@ const VIDEO_MODES = {
       ...createSearchMode("综艺", "综艺").sources
     ]
   },
+  trailer: createKeywordMode(
+    ["电影预告片", "新片预告", "预告片"],
+    "预告片",
+    /(预告|首曝|定档|先导|终极预告|新片|片花|trail?er)/i
+  ),
   huaqiang: createKeywordMode(
     ["华强买瓜 ai二创", "华强买瓜"],
     "华强买瓜AI",
